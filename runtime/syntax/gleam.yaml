@@ -4,9 +4,10 @@ detect:
   filename: "\\.gleam$"
 
 rules:
-  - statement: "\\b(fn|let|case|if|else|import|pub|type|opaque|const|use)\\b"
-  - identifier: "\\b(Int|Float|String|Bool|List|Option|Result|Nil)\\b"
+  - statement: "\\b(fn|let|case|if|use|import|pub|type|opaque|const|as|assert|panic|todo|echo)\\b"
+  - identifier: "\\b(Int|Float|String|Bool|List|Option|Result|Nil|BitArray)\\b"
   - constant: "\\b(True|False|Nil)\\b"
+  - operator: "(\\|>|->|<>|==|!=|<=|>=|&&|\\|\\|)"
   - comment:
       start: "//"
       end: "$"
@@ -14,4 +15,5 @@ rules:
       start: "\""
       end: "\""
       skip: "\\\\."
-  - special: "\\b[0-9]+\\b"
+  - special: "\\b[0-9]+\\.?[0-9]*\\b"
+  - type: "\\b[A-Z][a-zA-Z0-9_]*\\b"
