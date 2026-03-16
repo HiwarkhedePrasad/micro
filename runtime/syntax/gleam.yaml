@@ -4,16 +4,38 @@ detect:
   filename: "\\.gleam$"
 
 rules:
-  - statement: "\\b(fn|let|case|if|use|import|pub|type|opaque|const|as|assert|panic|todo|echo)\\b"
-  - identifier: "\\b(Int|Float|String|Bool|List|Option|Result|Nil|BitArray)\\b"
+  # 1. Base Identifier Rule (Must be first so specific types below overwrite it)
+  - identifier: "\\b[A-Z][a-zA-Z0-9_]*\\b"
+
+  # 2. Built-in Types (Overwrites the identifier rule for these exact matches; Nil removed)
+  - type: "\\b(Int|Float|String|Bool|List|Option|Result|BitArray)\\b"
+
+  # 3. Constants (Nil safely kept here)
   - constant: "\\b(True|False|Nil)\\b"
-  - operator: "(\\|>|->|<>|==|!=|<=|>=|&&|\\|\\|)"
+
+  # 4. Keywords
+  - statement: "\\b(fn|let|case|if|use|import|pub|type|opaque|const|as|assert|panic|todo|echo)\\b"
+
+  # 5. Attributes / Decorators (Added for @external, @deprecated, etc.)
+  - preproc: "@[a-zA-Z0-9_]+"
+
+  # 6. Operators (Moved to 'statement' for red highlighting; arithmetic, float math, and assignment added)
+  - statement: "(\\|>|->|<-|\\.\\.|<>|==|!=|<=|>=|&&|\\|\\||\\+\\.|-\\.|\\*\\.|/\\.|\\+|-|\\*|/|%|=|<|>)"
+
+  # 7. Numbers (Copied directly from Python's robust micro syntax as the maintainer requested)
+  - constant.number: "\\b0b[01]+\\b"
+  - constant.number: "\\b0o[0-7]+\\b"
+  - constant.number: "\\b0x[0-9a-fA-F]+\\b"
+  - constant.number: "\\b[0-9]+\\.[0-9]*([eE][+-]?[0-9]+)?\\b"
+  - constant.number: "\\b[0-9]+\\b"
+
+  # 8. Strings
+  - constant.string:
+      start: '"'
+      end: '"'
+      skip: "\\\\."
+
+  # 9. Comments
   - comment:
       start: "//"
       end: "$"
-  - string:
-      start: "\""
-      end: "\""
-      skip: "\\\\."
-  - special: "\\b[0-9]+\\.?[0-9]*\\b"
-  - type: "\\b[A-Z][a-zA-Z0-9_]*\\b"
